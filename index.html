@@ -1,272 +1,78 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team Accounting App</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body { font-family: Arial; background:#f4f6f8; margin:0; padding:10px; }
+    .app { max-width:480px; margin:auto; background:#fff; padding:15px; border-radius:10px; }
+    input, select, button { width:100%; padding:10px; margin:6px 0; }
+    button { background:#007bff; color:white; border:none; border-radius:5px; }
+    li { list-style:none; border-bottom:1px solid #ddd; padding:8px 0; }
+    small { color:#666; }
   </style>
 </head>
+
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</p>
-<p class="p1">&lt;title&gt;Team Accounting App&lt;/title&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;!-- Firebase --&gt;</p>
-<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"&gt;&lt;/script&gt;</p>
-<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"&gt;&lt;/script&gt;</p>
-<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"&gt;&lt;/script&gt;</p>
-<p class="p1">&lt;script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"&gt;&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;!-- Charts --&gt;</p>
-<p class="p1">&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1">body { font-family: Arial; background:#f4f6f8; margin:0; padding:10px; }</p>
-<p class="p1">.app { max-width:480px; margin:auto; background:#fff; padding:15px; border-radius:10px; }</p>
-<p class="p1">input, select, button { width:100%; padding:10px; margin:6px 0; }</p>
-<p class="p1">button { background:#007bff; color:white; border:none; border-radius:5px; }</p>
-<p class="p1">li { list-style:none; border-bottom:1px solid #ddd; padding:8px 0; }</p>
-<p class="p1">small { color:#666; }</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1">&lt;div class="app"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;h2&gt;📊 Team Accounting&lt;/h2&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;!-- LOGIN --&gt;</p>
-<p class="p1">&lt;div id="auth"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;input id="email" type="email" placeholder="Email"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;input id="password" type="password" placeholder="Password"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button onclick="login()"&gt;Login&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button onclick="register()"&gt;Register&lt;/button&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;button id="logoutBtn" onclick="logout()" style="display:none"&gt;Logout&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;hr&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;!-- ADD ENTRY --&gt;</p>
-<p class="p1">&lt;div id="entrySection" style="display:none"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;input id="desc" placeholder="Description"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;input id="amount" type="number" placeholder="Amount"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;select id="type"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option value="income"&gt;Income&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option value="expense"&gt;Expense&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;select id="category"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option&gt;Food&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option&gt;Transport&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option&gt;Rent&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option&gt;Supplies&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;option&gt;Other&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;input type="file" id="receipt" accept="image/*"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button onclick="addEntry()"&gt;Add Entry&lt;/button&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;h3 id="balance"&gt;$0&lt;/h3&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;ul id="list"&gt;&lt;/ul&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;hr&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;!-- MONTH FILTER --&gt;</p>
-<p class="p1">&lt;label&gt;📅 Month&lt;/label&gt;</p>
-<p class="p1">&lt;input type="month" id="monthFilter"&gt;</p>
-<p class="p1">&lt;button onclick="applyMonthFilter()"&gt;Apply Month&lt;/button&gt;</p>
-<p class="p1">&lt;button onclick="clearMonthFilter()"&gt;All Months&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;canvas id="chart"&gt;&lt;/canvas&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;button onclick="exportCSV()"&gt;📤 Export Excel&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p1">// 🔥 FIREBASE CONFIG (REPLACE WITH YOURS)</p>
-<p class="p1">firebase.initializeApp({</p>
-<p class="p1"><span class="Apple-converted-space">  </span>apiKey: "YOUR_API_KEY",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>authDomain: "YOUR_PROJECT.firebaseapp.com",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>projectId: "YOUR_PROJECT_ID",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>storageBucket: "YOUR_PROJECT.appspot.com"</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">const auth = firebase.auth();</p>
-<p class="p1">const db = firebase.firestore();</p>
-<p class="p1">const storage = firebase.storage();</p>
-<p class="p2"><br></p>
-<p class="p1">const WORKSPACE_ID = "team-accounting-001";</p>
-<p class="p2"><br></p>
-<p class="p1">let entries = [];</p>
-<p class="p1">let filteredEntries = [];</p>
-<p class="p1">let chart;</p>
-<p class="p2"><br></p>
-<p class="p1">// AUTH</p>
-<p class="p1">function register() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>auth.createUserWithEmailAndPassword(email.value, password.value)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.catch(e =&gt; alert(e.message));</p>
-<p class="p1">}</p>
-<p class="p1">function login() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>auth.signInWithEmailAndPassword(email.value, password.value)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.catch(e =&gt; alert(e.message));</p>
-<p class="p1">}</p>
-<p class="p1">function logout() { auth.signOut(); }</p>
-<p class="p2"><br></p>
-<p class="p1">auth.onAuthStateChanged(user =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (user) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>authDiv.style.display = "none";</p>
-<p class="p1"><span class="Apple-converted-space">    </span>logoutBtn.style.display = "block";</p>
-<p class="p1"><span class="Apple-converted-space">    </span>entrySection.style.display = "block";</p>
-<p class="p1"><span class="Apple-converted-space">    </span>loadEntries();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// default to current month</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const now = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>monthFilter.value = now.getFullYear() + "-" +</p>
-<p class="p1"><span class="Apple-converted-space">      </span>String(now.getMonth()+1).padStart(2,"0");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>authDiv.style.display = "block";</p>
-<p class="p1"><span class="Apple-converted-space">    </span>logoutBtn.style.display = "none";</p>
-<p class="p1"><span class="Apple-converted-space">    </span>entrySection.style.display = "none";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">// ADD ENTRY</p>
-<p class="p1">async function addEntry() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const user = auth.currentUser;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (!user) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>let receiptURL = "";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const file = receipt.files[0];</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (file) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const ref = storage.ref("receipts/" + Date.now() + "_" + file.name);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>await ref.put(file);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>receiptURL = await ref.getDownloadURL();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>db.collection("entries").add({</p>
-<p class="p1"><span class="Apple-converted-space">    </span>workspaceId: WORKSPACE_ID,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>desc: desc.value,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>amount: Number(amount.value),</p>
-<p class="p1"><span class="Apple-converted-space">    </span>type: type.value,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>category: category.value,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>receipt: receiptURL,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>created: new Date(),</p>
-<p class="p1"><span class="Apple-converted-space">    </span>createdBy: user.email</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>desc.value = amount.value = "";</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// LOAD DATA</p>
-<p class="p1">function loadEntries() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>db.collection("entries")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.where("workspaceId", "==", WORKSPACE_ID)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.orderBy("created")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.onSnapshot(snap =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>entries = [];</p>
-<p class="p1"><span class="Apple-converted-space">      </span>snap.forEach(doc =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>entries.push({ ...doc.data(), id: doc.id });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>applyMonthFilter();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// MONTH FILTER</p>
-<p class="p1">function applyMonthFilter() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (!monthFilter.value) {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>render(entries);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const [year, month] = monthFilter.value.split("-").map(Number);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>filteredEntries = entries.filter(e =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const d = e.created.toDate();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return d.getFullYear() === year &amp;&amp; d.getMonth()+1 === month;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>render(filteredEntries);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function clearMonthFilter() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>monthFilter.value = "";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render(entries);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// RENDER</p>
-<p class="p1">function render(data) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>list.innerHTML = "";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let balance = 0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let totals = {};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>data.forEach(e =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>balance += e.type === "income" ? e.amount : -e.amount;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>if (e.type === "expense") {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>totals[e.category] = (totals[e.category] || 0) + e.amount;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>list.innerHTML += `</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;strong&gt;${e.desc}&lt;/strong&gt; (${e.category})&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>${e.type === "income" ? "+" : "-"}$${e.amount}&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;small&gt;${e.createdBy}&lt;/small&gt;&lt;br&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>${e.receipt ? `&lt;a href="${e.receipt}" target="_blank"&gt;📸 Receipt&lt;/a&gt;` : ""}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>balanceEl.textContent = "$" + balance;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>buildChart(totals);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// CHART</p>
-<p class="p1">function buildChart(data) {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if (chart) chart.destroy();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>chart = new Chart(document.getElementById("chart"), {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>type: "pie",</p>
-<p class="p1"><span class="Apple-converted-space">    </span>data: {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>labels: Object.keys(data),</p>
-<p class="p1"><span class="Apple-converted-space">      </span>datasets: [{</p>
-<p class="p1"><span class="Apple-converted-space">        </span>data: Object.values(data),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>backgroundColor: [</p>
-<p class="p1"><span class="Apple-converted-space">          </span>"#ff6384","#36a2eb","#ffce56","#4caf50","#9c27b0"</p>
-<p class="p1"><span class="Apple-converted-space">        </span>]</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}]</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// EXPORT CSV</p>
-<p class="p1">function exportCSV() {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let csv = "Description,Amount,Type,Category,User\n";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>entries.forEach(e =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">    </span>csv += `${e.desc},${e.amount},${e.type},${e.category},${e.createdBy}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const a = document.createElement("a");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>a.href = URL.createObjectURL(new Blob([csv]));</p>
-<p class="p1"><span class="Apple-converted-space">  </span>a.download = "accounting.csv";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>a.click();</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">// ELEMENTS</p>
-<p class="p1">const authDiv = document.getElementById("auth");</p>
-<p class="p1">const logoutBtn = document.getElementById("logoutBtn");</p>
-<p class="p1">const entrySection = document.getElementById("entrySection");</p>
-<p class="p1">const balanceEl = document.getElementById("balance");</p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+  <div class="app">
+    <h2>📊 Team Accounting</h2>
+
+    <div id="auth">
+      <input id="email" type="email" placeholder="Email" />
+      <input id="password" type="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <button onclick="register()">Register</button>
+    </div>
+
+    <button id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
+
+    <hr />
+
+    <div id="entrySection" style="display:none">
+      <input id="desc" placeholder="Description" />
+      <input id="amount" type="number" placeholder="Amount" />
+      <select id="type">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+
+      <select id="category">
+        <option>Food</option>
+        <option>Transport</option>
+        <option>Rent</option>
+        <option>Supplies</option>
+        <option>Other</option>
+      </select>
+
+      <input type="file" id="receipt" accept="image/*" />
+      <button onclick="addEntry()">Add Entry</button>
+    </div>
+
+    <h3 id="balance">$0</h3>
+    <ul id="list"></ul>
+
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script>
+    // TODO: replace with your Firebase config
+    firebase.initializeApp({
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com"
+    });
+  </script>
 </body>
 </html>
