@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Team Accounting App</title>
 
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -13,21 +16,13 @@
 
   <!-- Charts -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    body { font-family: Arial; background:#f4f6f8; margin:0; padding:10px; }
-    .app { max-width:480px; margin:auto; background:#fff; padding:15px; border-radius:10px; }
-    input, select, button { width:100%; padding:10px; margin:6px 0; }
-    button { background:#007bff; color:white; border:none; border-radius:5px; }
-    li { list-style:none; border-bottom:1px solid #ddd; padding:8px 0; }
-    small { color:#666; }
-  </style>
 </head>
 
 <body>
   <div class="app">
     <h2>📊 Team Accounting</h2>
 
+    <!-- LOGIN -->
     <div id="auth">
       <input id="email" type="email" placeholder="Email" />
       <input id="password" type="password" placeholder="Password" />
@@ -39,9 +34,11 @@
 
     <hr />
 
+    <!-- ADD ENTRY -->
     <div id="entrySection" style="display:none">
       <input id="desc" placeholder="Description" />
       <input id="amount" type="number" placeholder="Amount" />
+
       <select id="type">
         <option value="income">Income</option>
         <option value="expense">Expense</option>
@@ -65,14 +62,7 @@
     <canvas id="chart"></canvas>
   </div>
 
-  <script>
-    // TODO: replace with your Firebase config
-    firebase.initializeApp({
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com"
-    });
-  </script>
+  <!-- JS -->
+  <script src="script.js"></script>
 </body>
 </html>
