@@ -1,9 +1,11 @@
 /************ FIREBASE CONFIG (REPLACE THESE) ************/
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com"
+  apiKey: "AIzaSyDdPTN-HI6S7vgXXKHtAtGnFdOtOOoc5FQ",
+    authDomain: "pnrbk-15236.firebaseapp.com",
+    projectId: "pnrbk-15236",
+    storageBucket: "pnrbk-15236.firebasestorage.app",
+    messagingSenderId: "633237652808",
+    appId: "1:633237652808:web:c626786f0811ec60271f7d"
 });
 
 /************ GLOBALS ************/
