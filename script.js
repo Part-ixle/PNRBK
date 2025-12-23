@@ -14,65 +14,95 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 
 const WORKSPACE_ID = "team-accounting-001";
-
 let entries = [];
 let chart;
 
+/************ UI HELPERS ************/
+function toast(message, type = "success") {
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.textContent = message;
+  document.body.appendChild(t);
+
+  setTimeout(() => t.classList.add("show"), 50);
+  setTimeout(() => {
+    t.classList.remove("show");
+    setTimeout(() => t.remove(), 300);
+  }, 2500);
+}
+
+function setLoading(btn, state) {
+  if (!btn) return;
+  btn.disabled = state;
+  btn.style.opacity = state ? "0.6" : "1";
+  btn.textContent = state ? "⏳ Working..." : btn.dataset.label;
+}
+
 /************ AUTH ************/
 function register() {
+  setLoading(event.target, true);
   auth.createUserWithEmailAndPassword(email.value, password.value)
-    .catch(e => alert(e.message));
+    .then(() => toast("🎉 Account created"))
+    .catch(e => toast(e.message, "error"))
+    .finally(() => setLoading(event.target, false));
 }
 
 function login() {
+  setLoading(event.target, true);
   auth.signInWithEmailAndPassword(email.value, password.value)
-    .catch(e => alert(e.message));
+    .then(() => toast("✅ Logged in"))
+    .catch(e => toast(e.message, "error"))
+    .finally(() => setLoading(event.target, false));
 }
 
 function logout() {
-  auth.signOut();
+  auth.signOut().then(() => toast("👋 Logged out"));
 }
 
 auth.onAuthStateChanged(user => {
-  if (user) {
-    authDiv.style.display = "none";
-    logoutBtn.style.display = "block";
-    entrySection.style.display = "block";
-    loadEntries();
-  } else {
-    authDiv.style.display = "block";
-    logoutBtn.style.display = "none";
-    entrySection.style.display = "none";
-  }
+  authDiv.style.display = user ? "none" : "block";
+  logoutBtn.style.display = user ? "block" : "none";
+  entrySection.style.display = user ? "block" : "none";
+
+  if (user) loadEntries();
 });
 
 /************ ADD ENTRY ************/
 async function addEntry() {
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user) return toast("Not logged in", "error");
 
-  let receiptURL = "";
-  const file = receipt.files[0];
+  setLoading(event.target, true);
 
-  if (file) {
-    const ref = storage.ref("receipts/" + Date.now() + "_" + file.name);
-    await ref.put(file);
-    receiptURL = await ref.getDownloadURL();
+  try {
+    let receiptURL = "";
+    const file = receipt.files[0];
+
+    if (file) {
+      const ref = storage.ref(`receipts/${Date.now()}_${file.name}`);
+      await ref.put(file);
+      receiptURL = await ref.getDownloadURL();
+    }
+
+    await db.collection("entries").add({
+      workspaceId: WORKSPACE_ID,
+      desc: desc.value,
+      amount: Number(amount.value),
+      type: type.value,
+      category: category.value,
+      receipt: receiptURL,
+      created: new Date(),
+      createdBy: user.email
+    });
+
+    desc.value = amount.value = "";
+    receipt.value = "";
+    toast("💾 Entry added");
+  } catch (e) {
+    toast(e.message, "error");
   }
 
-  await db.collection("entries").add({
-    workspaceId: WORKSPACE_ID,
-    desc: desc.value,
-    amount: Number(amount.value),
-    type: type.value,
-    category: category.value,
-    receipt: receiptURL,
-    created: new Date(),
-    createdBy: user.email
-  });
-
-  desc.value = "";
-  amount.value = "";
+  setLoading(event.target, false);
 }
 
 /************ LOAD + RENDER ************/
@@ -81,10 +111,7 @@ function loadEntries() {
     .where("workspaceId", "==", WORKSPACE_ID)
     .orderBy("created")
     .onSnapshot(snapshot => {
-      entries = [];
-      snapshot.forEach(doc => {
-        entries.push({ ...doc.data(), id: doc.id });
-      });
+      entries = snapshot.docs.map(d => ({ ...d.data(), id: d.id }));
       render(entries);
     });
 }
@@ -96,22 +123,25 @@ function render(data) {
 
   data.forEach(e => {
     balance += e.type === "income" ? e.amount : -e.amount;
-
     if (e.type === "expense") {
       totals[e.category] = (totals[e.category] || 0) + e.amount;
     }
 
-    list.innerHTML += `
-      <li>
-        <strong>${e.desc}</strong> (${e.category})<br />
-        ${e.type === "income" ? "+" : "-"}$${e.amount}<br />
-        <small>${e.createdBy}</small><br />
-        ${e.receipt ? `<a href="${e.receipt}" target="_blank">📸 Receipt</a>` : ""}
-      </li>
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${e.desc}</strong> (${e.category})<br>
+      ${e.type === "income" ? "🟢 +" : "🔴 -"}$${e.amount}<br>
+      <small>${e.createdBy}</small><br>
+      ${e.receipt ? `<a href="${e.receipt}" target="_blank">📸 Receipt</a>` : ""}
     `;
+    li.style.opacity = 0;
+    list.appendChild(li);
+    requestAnimationFrame(() => li.style.opacity = 1);
   });
 
   balanceEl.textContent = "$" + balance;
+  balanceEl.style.color = balance >= 0 ? "#2e7d32" : "#c62828";
+
   buildChart(totals);
 }
 
@@ -119,20 +149,29 @@ function render(data) {
 function buildChart(data) {
   if (chart) chart.destroy();
 
-  chart = new Chart(document.getElementById("chart"), {
-    type: "pie",
+  chart = new Chart(chartEl, {
+    type: "doughnut",
     data: {
       labels: Object.keys(data),
       datasets: [{
         data: Object.values(data),
         backgroundColor: [
-          "#ff6384",
-          "#36a2eb",
-          "#ffce56",
-          "#4caf50",
-          "#9c27b0"
+          "#ff6b6b",
+          "#4dabf7",
+          "#ffd43b",
+          "#69db7c",
+          "#b197fc"
         ]
       }]
+    },
+    options: {
+      animation: {
+        animateScale: true,
+        animateRotate: true
+      },
+      plugins: {
+        legend: { position: "bottom" }
+      }
     }
   });
 }
@@ -142,3 +181,10 @@ const authDiv = document.getElementById("auth");
 const logoutBtn = document.getElementById("logoutBtn");
 const entrySection = document.getElementById("entrySection");
 const balanceEl = document.getElementById("balance");
+const list = document.getElementById("list");
+const chartEl = document.getElementById("chart");
+
+/************ BUTTON LABELS ************/
+document.querySelectorAll("button").forEach(b => {
+  b.dataset.label = b.textContent;
+});
